@@ -13,6 +13,7 @@ import { AuthProvider } from "./context/AuthProvider";
 import { Toaster } from "react-hot-toast";
 import SignoutPage from "./pages/SignoutPage";
 import EditProject from "./components/projectPagecomponent/EditProject";
+import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 // import { ThemeProvider } from "./context/TheameProvider";
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
                 <Route index element={<Dashboard />} />
                 <Route path="projects" element={<ProjectPage />} />
                 <Route path="projects/add" element={<AddprojectPage />} />
+                <Route path="projects/:id" element={<ProjectDetailsPage />} />
                 <Route path="contact" element={<ContactPage />} />
                 <Route path="edit-project/:id" element={<EditProject />} />
               </Route>
