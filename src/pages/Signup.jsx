@@ -1,4 +1,5 @@
 // src/pages/Signup.jsx
+// src/pages/Signup.jsx
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -52,8 +53,8 @@ function Signup() {
     setIsLoading(true);
 
     try {
-      // First, sign up the user with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Sign up the user with Supabase Auth - that's all you need!
+      const { error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -63,22 +64,8 @@ function Signup() {
         },
       });
 
-      if (authError) {
-        throw authError;
-      }
-
-      // Then, create a user profile in the database
-      const { error: profileError } = await supabase.from("profiles").insert([
-        {
-          id: authData.user.id,
-          email: formData.email,
-          full_name: formData.fullName,
-          created_at: new Date().toISOString(),
-        },
-      ]);
-
-      if (profileError) {
-        throw profileError;
+      if (error) {
+        throw error;
       }
 
       toast.success(

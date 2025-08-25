@@ -1,12 +1,12 @@
 function Logo() {
-  const src = "/public/The-workbench-logo.png";
+  // const src = "/The-workbench-logo.png";
 
   return (
     <div className="flex justify-between items-center mb-4">
       {/* Logo */}
       <div className="h-20 w-auto">
         <img
-          src={src}
+          src="/The-Workbench-logo.png"
           alt="The Workbench Logo"
           className="h-full w-full object-contain transition-transform hover:scale-105"
         />

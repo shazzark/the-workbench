@@ -11,14 +11,27 @@ function AppLayout() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fetch projects from Supabase on component mount
+  // Fetch ONLY the current user's projects from Supabase
   useEffect(() => {
-    async function fetchProjects() {
+    async function fetchUserProjects() {
       try {
         setLoading(true);
+
+        // Get current user
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        // Fetch only this user's projects
         const { data, error } = await supabase
           .from("projects")
           .select("*")
+          .eq("user_id", user.id) // ← ONLY current user's projects
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -29,13 +42,13 @@ function AppLayout() {
           setProject(data);
         }
       } catch (error) {
-        console.error("Error fetching projects:", error);
+        console.error("Error fetching user projects:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchProjects();
+    fetchUserProjects();
   }, []);
 
   function handleProjectSelect(projectID) {
@@ -48,9 +61,25 @@ function AppLayout() {
 
   async function HandleaddProject(newProject) {
     try {
+      // Get current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Add user_id to the project
+      const projectWithUser = {
+        ...newProject,
+        user_id: user.id,
+      };
+
+      // Insert into Supabase ONLY
       const { data, error } = await supabase
         .from("projects")
-        .insert([newProject])
+        .insert([projectWithUser])
         .select();
 
       if (error) {
@@ -58,10 +87,22 @@ function AppLayout() {
       }
 
       if (data && data.length > 0) {
-        setProject((prevProjects) => [...prevProjects, data[0]]);
+        // REFETCH from Supabase instead of updating local state
+        const { data: updatedData } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+
+        if (updatedData) {
+          setProject(updatedData);
+        }
+
+        return data[0];
       }
     } catch (error) {
       console.error("Error adding project:", error);
+      throw error;
     }
   }
 
@@ -100,12 +141,12 @@ function AppLayout() {
           <Outlet
             context={{
               Project,
-              setProject, // Pass the state setter for updates
-              addProject: HandleaddProject, // Pass the add function
+              setProject,
+              addProject: HandleaddProject,
               contact,
               setContact,
               handlecontactSubmit,
-              supabase, // Pass the supabase client
+              supabase,
             }}
           />
         </div>

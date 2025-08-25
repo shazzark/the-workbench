@@ -4,14 +4,13 @@ import { useState, useContext } from "react";
 import Select from "react-select";
 import { useOutletContext } from "react-router-dom";
 import toast from "react-hot-toast";
-import { supabase } from "../services/supabase";
+// import { supabase } from "../services/supabase";
 import AddProjectForm from "../components/AddProject component/AddProjectForm";
 import { ThemeContext } from "../context/ThemeContext";
 import { getReactSelectStyles } from "../utils/getReactSelectStyles";
-// import { getReactSelectStyles } from "../utils/reactSelectStyles";
 
 function AddProject() {
-  const { setProject } = useOutletContext();
+  const { addProject } = useOutletContext(); // Only need addProject now
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { theme } = useContext(ThemeContext);
 
@@ -68,29 +67,13 @@ function AddProject() {
       // Prepare data for Supabase
       const projectData = {
         name: form.name,
-        stack: form.stack.map((option) => option.value), // Extract just the values
+        stack: form.stack.map((option) => option.value),
         description: form.description,
-        link: form.link || null, // Set to null if empty
+        link: form.link || null,
       };
 
-      // Insert into Supabase
-      const { data, error } = await supabase
-        .from("projects")
-        .insert([projectData])
-        .select();
-
-      if (error) {
-        throw error;
-      }
-
-      // Update local state with the returned data (which includes the ID from Supabase)
-      const newProject = {
-        ...projectData,
-        id: data[0].id,
-        created_at: data[0].created_at,
-      };
-
-      setProject((prev) => [...prev, newProject]);
+      // ONLY call addProject - it handles everything
+      await addProject(projectData);
 
       // Reset form
       setForm({ name: "", stack: [], description: "", link: "" });
