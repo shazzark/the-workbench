@@ -14,7 +14,7 @@ import {
 } from "react-icons/hi";
 import toast from "react-hot-toast";
 import ProjectDeleteModal from "../components/Modals component/ProjectDeleteModal";
-// import ProjectDeleteModal from "../components/Modals component/ProjectDeleteModal";
+ 
 
 function ProjectDetailsPage() {
   const { id } = useParams();

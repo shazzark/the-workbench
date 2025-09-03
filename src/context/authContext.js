@@ -5,4 +5,7 @@ export const AuthContext = createContext({
   user: null,
   loading: true,
   logout: () => {},
+  loginWithGoogle: () => {},
+  signUpWithEmail: () => {},
+  signInWithEmail: () => {},
 });

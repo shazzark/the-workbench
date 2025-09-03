@@ -1,3 +1,4 @@
+// src/context/AuthProvider.jsx
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
 import { AuthContext } from "./authContext";
@@ -73,11 +74,60 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
   };
 
+  // Email/password sign-up
+  const signUpWithEmail = async (email, password, fullName) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName }, // custom metadata
+          emailRedirectTo: window.location.origin, // optional
+        },
+      });
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Signup error:", error);
+      throw error;
+    }
+  };
+
+  // Email/password login
+  const signInWithEmail = async (email, password) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(), // Trim whitespace from email
+        password,
+      });
+
+      if (error) {
+        // More specific error messages
+        if (error.message === "Invalid login credentials") {
+          throw new Error(
+            "Invalid email or password. Please check your credentials."
+          );
+        } else if (error.message === "Email not confirmed") {
+          throw new Error("Please confirm your email before logging in.");
+        } else {
+          throw error;
+        }
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     loading,
     logout,
     loginWithGoogle,
+    signUpWithEmail,
+    signInWithEmail,
   };
 
   return (

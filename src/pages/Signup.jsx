@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { supabase } from "../services/supabase";
+// import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
 import SignupForm from "../components/Signup component/SignupForm";
 import SignupWithGoogle from "../components/Signup component/SignupWithGoggle";
@@ -21,7 +21,7 @@ function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { loginWithGoogle } = useAuth();
+  const { signUpWithEmail, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -53,21 +53,11 @@ function Signup() {
     setIsLoading(true);
 
     try {
-      // Sign up the user with Supabase Auth - that's all you need!
-      const { error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-          },
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
+      await signUpWithEmail(
+        formData.email,
+        formData.password,
+        formData.fullName
+      );
       toast.success(
         "Account created successfully! Please check your email to confirm your account."
       );
@@ -81,14 +71,16 @@ function Signup() {
       setIsLoading(false);
     }
   };
-
   const handleGoogleSignup = async () => {
     try {
+      setIsLoading(true);
       await loginWithGoogle();
       toast.success("Account created with Google successfully!");
     } catch (error) {
       console.error("Google signup error:", error);
       toast.error(error.message || "Failed to sign up with Google.");
+    } finally {
+      setIsLoading(false);
     }
   };
 

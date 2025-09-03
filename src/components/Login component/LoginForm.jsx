@@ -1,6 +1,5 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/outline";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 function LoginForm({
@@ -17,7 +16,9 @@ function LoginForm({
         <div className="rounded-md shadow-sm space-y-4">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MagnifyingGlassCircleIcon className="h-5 w-5 text-gray-400" />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
+              </div>
             </div>
             <input
               id="email"

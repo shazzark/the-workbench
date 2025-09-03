@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { supabase } from "../services/supabase";
+
 import toast from "react-hot-toast";
 import LoginForm from "../components/Login component/LoginForm";
 import LoginSignupwithGoggle from "../components/Login component/LoginSignupwithGoggle";
@@ -17,7 +17,7 @@ function Login() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, signInWithEmail } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -32,15 +32,7 @@ function Login() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (error) {
-        throw error;
-      }
-
+      await signInWithEmail(formData.email, formData.password);
       toast.success("Login successful! Redirecting...");
       navigate("/");
     } catch (error) {
@@ -53,11 +45,14 @@ function Login() {
 
   const handleGoogleLogin = async () => {
     try {
+      setIsLoading(true);
       await loginWithGoogle();
       toast.success("Login with Google successful!");
     } catch (error) {
       console.error("Google login error:", error);
       toast.error(error.message || "Failed to login with Google.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
